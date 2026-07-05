@@ -38,14 +38,9 @@
     "class-variance-authority": "0.7.0",
     "clsx": "2.1.1",
     "date-fns": "3.6.0",
-    "eslint": "^9.39.4",
     "framer-motion": "11.11.17",
     "lucide-react": "0.460.0",
-<<<<<<< HEAD
-    "next": "^15.5.3",
-=======
-    "next": "15.5.2",
->>>>>>> f3453c54172ff8fc196ac3e6b388ef3c36f2f582
+    "next": "15.5.3",
     "next-auth": "5.0.0-beta.25",
     "react": "18.3.1",
     "react-dom": "18.3.1",
@@ -62,11 +57,8 @@
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "autoprefixer": "10.4.20",
-<<<<<<< HEAD
-=======
-    "eslint": "8.57.1",
->>>>>>> f3453c54172ff8fc196ac3e6b388ef3c36f2f582
-    "eslint-config-next": "15.5.2",
+    "eslint": "9.39.4",
+    "eslint-config-next": "15.5.3",
     "postcss": "8.4.47",
     "prisma": "5.22.0",
     "tailwindcss": "3.4.14",
