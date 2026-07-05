@@ -9,6 +9,11 @@ const nextConfig = {
     ],
   },
 
+  eslint: {
+    // Prevents build failure due to ESLint version/config mismatch
+    ignoreDuringBuilds: true,
+  },
+
   async headers() {
     return [
       {
