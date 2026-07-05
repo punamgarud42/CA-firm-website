@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   FileText, Upload, Download, Search, Filter, Folder,
-  File, FilePdf, Trash2, Eye, Grid, List
+  File, Trash2, Eye, Grid, List
 } from "lucide-react";
 import { uploadDocument } from "@/actions/documents";
 import { useToast } from "@/components/ui/toast-provider";

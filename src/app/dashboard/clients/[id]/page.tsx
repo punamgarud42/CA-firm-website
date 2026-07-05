@@ -5,13 +5,18 @@ import { ClientDetail } from "@/components/dashboard/client-detail";
 
 export const dynamic = "force-dynamic";
 
-export default async function ClientDetailPage({ params }: { params: { id: string } }) {
+interface Props {
+  params: Promise<{ id: string }>;
+}
+
+export default async function ClientDetailPage({ params }: Props) {
+  const { id } = await params;
   const session = await auth();
   const role = (session?.user as any)?.role;
   if (!["SUPER_ADMIN", "CA_STAFF"].includes(role)) redirect("/dashboard");
 
   const client = await prisma.client.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       user: { select: { name: true, email: true, phone: true, createdAt: true } },
       assignedCA: { include: { user: { select: { name: true, email: true } } } },

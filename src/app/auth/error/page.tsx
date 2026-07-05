@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
-export default function AuthErrorPage({
-  searchParams,
-}: {
-  searchParams: { error?: string };
-}) {
+interface Props {
+  searchParams: Promise<{ error?: string }>;
+}
+
+export default async function AuthErrorPage({ searchParams }: Props) {
+  const { error } = await searchParams;
+  
   const errorMessages: Record<string, string> = {
     Configuration: "There is a problem with the server configuration.",
     AccessDenied: "You do not have permission to sign in.",
@@ -19,8 +20,8 @@ export default function AuthErrorPage({
     Default: "An authentication error occurred. Please try again.",
   };
 
-  const error = searchParams.error ?? "Default";
-  const message = errorMessages[error] ?? errorMessages.Default;
+  const errorCode = error ?? "Default";
+  const message = errorMessages[errorCode] ?? errorMessages.Default;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center px-4">
@@ -31,15 +32,21 @@ export default function AuthErrorPage({
         <h1 className="text-2xl font-black text-slate-900 mb-2">Authentication Error</h1>
         <p className="text-slate-500 mb-6">{message}</p>
         <div className="flex flex-col gap-3">
-          <Button variant="primary" asChild>
-            <Link href="/auth/login">Try Again</Link>
-          </Button>
-          <Button variant="ghost" asChild>
-            <Link href="/">Go to Homepage</Link>
-          </Button>
+          <Link
+            href="/auth/login"
+            className="inline-flex items-center justify-center rounded-lg text-sm font-semibold px-4 h-10 bg-[#2563EB] text-white hover:bg-[#1d4ed8] transition-all"
+          >
+            Try Again
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center rounded-lg text-sm font-semibold px-4 h-10 hover:bg-slate-100 text-slate-700 transition-all"
+          >
+            Go to Homepage
+          </Link>
         </div>
         <p className="text-xs text-slate-400 mt-4">
-          Error code: <code className="bg-slate-100 px-1 rounded">{error}</code>
+          Error code: <code className="bg-slate-100 px-1 rounded">{errorCode}</code>
         </p>
       </div>
     </div>

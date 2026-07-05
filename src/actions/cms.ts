@@ -40,7 +40,7 @@ const postSchema = z.object({
 
 export async function createBlogPost(formData: FormData) {
   const session = await auth();
-  if ((session?.user as any)?.role !== "SUPER_ADMIN") return { success: false, error: "Unauthorized" };
+  if (!session || (session?.user as any)?.role !== "SUPER_ADMIN") return { success: false, error: "Unauthorized" };
 
   const raw = {
     title: formData.get("title"),
@@ -61,7 +61,7 @@ export async function createBlogPost(formData: FormData) {
       ...parsed.data,
       slug,
       tags: parsed.data.tags ? parsed.data.tags.split(",").map((t) => t.trim()) : [],
-      authorId: session.user?.id,
+      authorId: session.user!.id,
       authorName: session.user?.name,
     },
   });
