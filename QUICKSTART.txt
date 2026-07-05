@@ -1,0 +1,165 @@
+════════════════════════════════════════════════════════════════════════════════
+  TaxPro CA Platform - QUICK START
+════════════════════════════════════════════════════════════════════════════════
+
+Your enterprise CA firm platform is complete and ready to run.
+
+────────────────────────────────────────────────────────────────────────────────
+ 1. INSTALL DEPENDENCIES (1 minute)
+────────────────────────────────────────────────────────────────────────────────
+
+Open PowerShell in the project directory and run:
+
+  cd "E:\website\CA firm\ca-firm-platform"
+  ..\setup.ps1
+
+OR manually:
+
+  npm install --legacy-peer-deps
+
+This installs Next.js 14, React, Prisma, Supabase, authentication, UI components,
+and all other dependencies.
+
+────────────────────────────────────────────────────────────────────────────────
+ 2. SET UP DATABASE (2 minutes)
+────────────────────────────────────────────────────────────────────────────────
+
+Easiest: Use Supabase (free account at supabase.com)
+  • Create project
+  • Copy PostgreSQL connection string
+  • Paste into .env.local as DATABASE_URL
+
+Other option: Use local PostgreSQL
+  • Create database: createdb ca_firm_db
+  • Connection string: postgresql://postgres:password@localhost:5432/ca_firm_db
+
+────────────────────────────────────────────────────────────────────────────────
+ 3. CONFIGURE ENVIRONMENT (2 minutes)
+────────────────────────────────────────────────────────────────────────────────
+
+Create .env.local file with:
+
+  DATABASE_URL="your-postgres-connection-string"
+  AUTH_SECRET="your-random-32-char-string"
+  AUTH_URL="http://localhost:3000"
+  NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
+  NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-key"
+  SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+
+See .env.local (already created) for all available options.
+
+────────────────────────────────────────────────────────────────────────────────
+ 4. INITIALIZE DATABASE (1 minute)
+────────────────────────────────────────────────────────────────────────────────
+
+  npm run db:generate
+  npm run db:push
+  npm run db:seed
+
+This creates tables and seeds demo data:
+  • Admin account: admin@taxpro.in / Admin@123456
+  • CA Staff: ca.rajesh@taxpro.in / Staff@123456
+  • Client: client@techventures.in / Client@123456
+
+────────────────────────────────────────────────────────────────────────────────
+ 5. START DEVELOPMENT SERVER (done)
+────────────────────────────────────────────────────────────────────────────────
+
+  npm run dev
+
+Open: http://localhost:3000
+
+You'll see:
+  • Public website at /
+  • Login page at /auth/login
+  • Client portal at /dashboard (after login)
+  • Admin dashboard (with admin account)
+
+════════════════════════════════════════════════════════════════════════════════
+  WHAT YOU GET
+════════════════════════════════════════════════════════════════════════════════
+
+✓ Public Website
+  - Modern hero section
+  - 9 service pages
+  - About, blog, FAQs, contact forms
+  - Testimonials and case studies
+
+✓ Client Portal (/dashboard)
+  - Compliance tracker (GST, ITR, ROC, TDS)
+  - Document management
+  - Task management
+  - Appointment booking
+  - Real-time chat with CA
+  - Invoice tracking
+  - AI tax assistant
+
+✓ Admin Dashboard
+  - Client management
+  - Lead tracking
+  - Staff management
+  - Analytics and reports
+  - CMS for blog and content
+
+✓ Security & Compliance
+  - Email/password + Google OAuth
+  - Role-based access control
+  - Secure file uploads
+  - Password hashing (bcrypt)
+  - Session management
+  - Audit logging
+
+✓ Database
+  - PostgreSQL schema (25+ tables)
+  - Prisma ORM with full type safety
+  - Automatic migrations
+  - Seed script with demo data
+
+════════════════════════════════════════════════════════════════════════════════
+  PRODUCTION DEPLOYMENT
+════════════════════════════════════════════════════════════════════════════════
+
+1. Read DEPLOYMENT.md for step-by-step Vercel + Supabase setup
+2. Push code to GitHub
+3. Connect to Vercel
+4. Set environment variables
+5. Deploy
+
+The entire process takes ~30 minutes.
+
+════════════════════════════════════════════════════════════════════════════════
+  FILES STRUCTURE
+════════════════════════════════════════════════════════════════════════════════
+
+All source code is in src/
+  • src/app/ — Next.js pages and layouts
+  • src/components/ — React components
+  • src/actions/ — Server actions
+  • src/lib/ — Utilities and configs
+
+Configuration files:
+  • package.json — Dependencies
+  • tsconfig.json — TypeScript config
+  • tailwind.config.ts — Styling
+  • next.config.ts — Next.js config
+  • prisma/schema.prisma — Database schema
+  • .env.local — Environment variables (create this)
+
+════════════════════════════════════════════════════════════════════════════════
+  TECH STACK
+════════════════════════════════════════════════════════════════════════════════
+
+Frontend:  Next.js 14, React 18, TypeScript, Tailwind CSS, Radix UI
+Backend:   Next.js Server Actions, Route Handlers
+Database:  PostgreSQL + Prisma ORM
+Auth:      NextAuth v5, Google OAuth, bcrypt
+Storage:   Supabase Storage
+UI:        Shadcn-inspired components, Framer Motion
+Charts:    Recharts
+Forms:     React Hook Form, Zod validation
+Email:     Resend (contact notifications)
+AI:        OpenAI GPT-4 (or built-in fallback)
+
+════════════════════════════════════════════════════════════════════════════════
+
+For detailed troubleshooting, see RUN_GUIDE.md

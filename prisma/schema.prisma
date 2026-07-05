@@ -1,0 +1,386 @@
+// This is your Prisma schema file
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  SUPER_ADMIN
+  CA_STAFF
+  CLIENT
+}
+
+enum ComplianceStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  CONVERTED
+  LOST
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum DocumentCategory {
+  GST
+  INCOME_TAX
+  AUDIT
+  ROC
+  COMPANY_DOCUMENTS
+  GENERAL
+}
+
+// ─── Auth (NextAuth) ──────────────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Core Models ─────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  phone         String?
+  passwordHash  String?
+  role          Role      @default(CLIENT)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts     Account[]
+  sessions     Session[]
+  clientProfile Client?      @relation("ClientUser")
+  staffProfile  StaffMember? @relation("StaffUser")
+  sentMessages  Message[]    @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  auditLogs    AuditLog[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Client {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  companyName   String
+  gstNumber     String?
+  panNumber     String?
+  address       String?
+  city          String?
+  state         String?
+  pincode       String?
+  industry      String?
+  assignedCAId  String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user         User          @relation("ClientUser", fields: [userId], references: [id], onDelete: Cascade)
+  assignedCA   StaffMember?  @relation("AssignedClients", fields: [assignedCAId], references: [id])
+  documents    Document[]
+  tasks        Task[]
+  appointments Appointment[]
+  compliance   Compliance[]
+  invoices     Invoice[]
+
+  @@index([userId])
+  @@index([assignedCAId])
+  @@index([gstNumber])
+  @@index([panNumber])
+}
+
+model StaffMember {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  designation  String?
+  department   String?
+  expertise    String[]
+  joiningDate  DateTime?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user            User     @relation("StaffUser", fields: [userId], references: [id], onDelete: Cascade)
+  assignedClients Client[] @relation("AssignedClients")
+  tasksCreated    Task[]   @relation("TaskCreatedBy")
+
+  @@index([userId])
+}
+
+model Document {
+  id         String           @id @default(cuid())
+  title      String
+  fileUrl    String
+  fileType   String?
+  fileSize   Int?
+  category   DocumentCategory @default(GENERAL)
+  clientId   String
+  uploadedBy String?
+  tags       String[]
+  isActive   Boolean          @default(true)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([category])
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  title       String
+  description String?    @db.Text
+  status      TaskStatus @default(TODO)
+  priority    String     @default("MEDIUM")
+  dueDate     DateTime?
+  clientId    String
+  assignedToId String?
+  createdById  String?
+  completedAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  client    Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdBy StaffMember? @relation("TaskCreatedBy", fields: [createdById], references: [id])
+
+  @@index([clientId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+model Appointment {
+  id          String            @id @default(cuid())
+  clientId    String
+  title       String
+  description String?
+  scheduledAt DateTime
+  duration    Int               @default(60) // minutes
+  status      AppointmentStatus @default(PENDING)
+  meetingLink String?
+  notes       String?           @db.Text
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([scheduledAt])
+  @@index([status])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  content    String   @db.Text
+  isRead     Boolean  @default(false)
+  attachmentUrl String?
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+}
+
+model Compliance {
+  id             String           @id @default(cuid())
+  clientId       String
+  complianceType String           // GST, ITR, ROC, TDS, AUDIT, etc.
+  description    String?
+  status         ComplianceStatus @default(PENDING)
+  dueDate        DateTime
+  completedAt    DateTime?
+  periodFrom     DateTime?
+  periodTo       DateTime?
+  notes          String?          @db.Text
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([complianceType])
+}
+
+model Invoice {
+  id          String        @id @default(cuid())
+  invoiceNo   String        @unique
+  clientId    String
+  amount      Decimal       @db.Decimal(12, 2)
+  gstAmount   Decimal?      @db.Decimal(12, 2)
+  totalAmount Decimal       @db.Decimal(12, 2)
+  status      InvoiceStatus @default(DRAFT)
+  dueDate     DateTime?
+  paidAt      DateTime?
+  invoiceUrl  String?
+  description String?
+  lineItems   Json?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([status])
+  @@index([invoiceNo])
+}
+
+model Lead {
+  id          String     @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  company     String?
+  service     String?
+  message     String?    @db.Text
+  status      LeadStatus @default(NEW)
+  source      String?    @default("WEBSITE")
+  assignedTo  String?
+  notes       String?    @db.Text
+  convertedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([status])
+  @@index([email])
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String   @db.Text
+  coverImage  String?
+  category    String?
+  tags        String[]
+  isPublished Boolean  @default(false)
+  authorId    String?
+  authorName  String?
+  metaTitle   String?
+  metaDesc    String?
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([isPublished])
+  @@index([category])
+}
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  clientName  String
+  company     String?
+  rating      Int      @default(5)
+  review      String   @db.Text
+  image       String?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model FAQ {
+  id          String   @id @default(cuid())
+  question    String
+  answer      String   @db.Text
+  category    String?
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String?
+  entityId  String?
+  metadata  Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}

@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TaxPro — Premium Enterprise CA Firm Platform
 
-## Getting Started
+A world-class, enterprise-grade Chartered Accountant (CA) firm platform built with Next.js 14, TypeScript, Prisma, and Supabase.
 
-First, run the development server:
+## Features
+
+### Public Website
+- Premium hero section with animated counters
+- Services showcase (9 services with detailed cards)
+- About page with team, mission, values
+- Industries served section
+- Client testimonials carousel
+- Blog with SEO optimization
+- FAQ accordion with search
+- Contact page with lead capture form
+- WhatsApp & call CTAs
+
+### Client Portal
+- Secure login (Email + Google OAuth)
+- Compliance tracker with status dashboard
+- Document manager (upload, download, organize by category)
+- Task management (Kanban + list view)
+- Appointment booking system
+- Real-time messaging with assigned CA
+- Invoice & payment history
+- AI Tax Assistant (GST, ITR, TDS queries)
+- Profile & company settings
+
+### Admin Dashboard
+- KPI metrics (clients, revenue, leads, compliance)
+- Revenue & client growth charts
+- Complete client management
+- Lead tracking with status pipeline
+- Staff management
+- Compliance administration
+- Invoice management
+
+### Security
+- Role-based access control (Super Admin, CA Staff, Client)
+- JWT sessions with server-side validation
+- CSRF protection via NextAuth
+- Secure file upload validation
+- SQL injection prevention (Prisma)
+- Security headers (CSP, HSTS, etc.)
+- Middleware route protection
+
+## Quick Start
 
 ```bash
+npm install
+cp .env.example .env.local
+# Fill in environment variables
+npm run db:push
+npm run db:seed
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Demo Accounts (after seeding)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Role | Email | Password |
+|------|-------|----------|
+| Super Admin | admin@taxpro.in | Admin@123456 |
+| CA Staff | ca.rajesh@taxpro.in | Staff@123456 |
+| Client | client@techventures.in | Client@123456 |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js 14, React 18, TypeScript |
+| Styling | Tailwind CSS 3, custom components |
+| Animations | Framer Motion, CSS animations |
+| Database | PostgreSQL + Prisma ORM |
+| Auth | NextAuth v5 (Credentials + Google) |
+| Storage | Supabase Storage |
+| Email | Resend |
+| AI | OpenAI GPT-4o-mini |
+| Charts | Recharts |
+| Deployment | Vercel + Supabase |
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for full deployment instructions.
