@@ -1,7 +1,7 @@
 # ✅ Next.js 14/15 Params Promise Fix
 
 ## Problem
-Error: `Route "/services/[slug]" used params.slug. params is a Promise and must be unwrapped with await or React.use() before accessing its properties.`
+Error: `Route "/services/[slug]" used slug. params is a Promise and must be unwrapped with await or React.use() before accessing its properties.`
 
 This is a change in Next.js 14+ where `params` became a Promise.
 
@@ -27,7 +27,7 @@ interface Props {
 ```typescript
 // Before
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const service = SERVICES[params.slug];
+  const service = SERVICES[slug];
   ...
 }
 
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 ```typescript
 // Before
 export default function ServicePage({ params }: Props) {
-  const service = SERVICES[params.slug];
+  const service = SERVICES[slug];
   ...
 }
 
@@ -56,11 +56,11 @@ export default async function ServicePage({ params }: Props) {  // ✅ Made asyn
 ```
 
 ### 3. Updated Related Services Filter
-In the sidebar, changed from using `params.slug` to using the local `slug` variable:
+In the sidebar, changed from using `slug` to using the local `slug` variable:
 
 ```typescript
 // Before
-.filter(([slug]) => slug !== params.slug)
+.filter(([slug]) => slug !== slug)
 
 // After
 .filter(([serviceSlug]) => serviceSlug !== slug)

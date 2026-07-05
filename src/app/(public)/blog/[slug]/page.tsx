@@ -5,11 +5,18 @@ import Link from "next/link";
 import { ArrowLeft, Calendar, User, Tag } from "lucide-react";
 import type { Metadata } from "next";
 
-interface Props { params: { slug: string } }
+
+interface Props {
+  params: Promise<{ slug: string }>;
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+
   try {
-    const post = await prisma.blogPost.findUnique({ where: { slug: params.slug } });
+    const post = await prisma.blogPost.findUnique({
+      where: { slug },
+    });
     if (!post) return { title: "Post Not Found" };
     return {
       title: post.metaTitle ?? post.title,
@@ -26,11 +33,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogPostPage({ params }: Props) {
+  const { slug } = await params;
   let post: any = null;
 
   try {
     post = await prisma.blogPost.findUnique({
-      where: { slug: params.slug, isPublished: true },
+      where: { slug: slug, isPublished: true },
     });
   } catch {
     // DB not connected — show sample content
@@ -49,14 +57,14 @@ export default async function BlogPostPage({ params }: Props) {
       },
     };
 
-    post = samplePosts[params.slug];
+    post = samplePosts[slug];
     if (!post) notFound();
   }
 
   const related = [];
   try {
     const relatedPosts = await prisma.blogPost.findMany({
-      where: { isPublished: true, category: post.category, slug: { not: params.slug } },
+      where: { isPublished: true, category: post.category, slug: { not: slug } },
       select: { id: true, title: true, slug: true, publishedAt: true, category: true },
       take: 3,
     });
